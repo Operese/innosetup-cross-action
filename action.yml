@@ -1,0 +1,36 @@
+name: "InnoSetup Cross"
+description: "Cross-compile InnoSetup installers using Wine on Ubuntu."
+inputs:
+  filename:
+    description: The .iss setup file to be compiled
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Install Wine
+      shell: bash
+      run: |
+        sudo apt-get install -y wine x11vnc xserver-xorg-video-dummy
+        sudo dpkg --add-architecture i386
+        sudo apt-get update
+        sudo apt-get install -y wine32:i386
+
+    - name: Install InnoSetup
+      shell: bash
+      run: |
+        curl -SL "https://files.jrsoftware.org/is/6/innosetup-6.4.0.exe" -o is.exe
+        sudo Xdummy :0
+        export DISPLAY=:0.0
+        wine is.exe /SP- /VERYSILENT /ALLUSERS /SUPPRESSMSGBOXES /DOWNLOADISCRYPT=1
+        rm is.exe
+    
+    - name: Build Inno Setup installer
+      shell: bash
+      run: |
+        export PROGFILES_PATH="$(winepath -u "$(wine cmd /c echo %ProgramFiles% 2> /dev/null)" 2> /dev/null)"
+        export INNO_BIN="Inno Setup 6/ISCC.exe"
+        export INNO_PATH="${PROGFILES_PATH}/${INNO_BIN}"
+
+        wine "${INNO_PATH}" ${{ inputs.filename }}
+
