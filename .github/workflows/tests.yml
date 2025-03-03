@@ -9,7 +9,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build Installer
+      - name: Build installer
         uses: ./
         with:
           filename: Test.iss
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ActionTestInstaller.exe
+          path: Output/ActionTestInstaller.exe
+          if-no-files-found: error
+          

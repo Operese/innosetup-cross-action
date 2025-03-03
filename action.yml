@@ -11,26 +11,25 @@ runs:
     - name: Install Wine
       shell: bash
       run: |
-        sudo apt-get install -y wine x11vnc xserver-xorg-video-dummy
         sudo dpkg --add-architecture i386
         sudo apt-get update
-        sudo apt-get install -y wine32:i386
+        sudo apt-get install -y wine wine32
+        sudo apt-get install -y x11vnc xserver-xorg-video-dummy
 
     - name: Install InnoSetup
+      env:
+        DISPLAY: :0.0
+        WINEDEBUG: -all,err+all
       shell: bash
       run: |
         curl -SL "https://files.jrsoftware.org/is/6/innosetup-6.4.0.exe" -o is.exe
-        sudo Xdummy :0
-        export DISPLAY=:0.0
+        sudo Xdummy :0 > /dev/null 2>&1 &
         wine is.exe /SP- /VERYSILENT /ALLUSERS /SUPPRESSMSGBOXES /DOWNLOADISCRYPT=1
         rm is.exe
-    
+      
     - name: Build Inno Setup installer
       shell: bash
-      run: |
-        export PROGFILES_PATH="$(winepath -u "$(wine cmd /c echo %ProgramFiles% 2> /dev/null)" 2> /dev/null)"
-        export INNO_BIN="Inno Setup 6/ISCC.exe"
-        export INNO_PATH="${PROGFILES_PATH}/${INNO_BIN}"
-
-        wine "${INNO_PATH}" ${{ inputs.filename }}
+      env:
+        WINEDEBUG: -all,err+all
+      run: ${GITHUB_ACTION_PATH}/iscc.sh
 
