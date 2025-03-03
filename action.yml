@@ -13,12 +13,11 @@ runs:
       run: |
         sudo dpkg --add-architecture i386
         sudo apt-get update
-
     
     - name: Install and cache packages
       uses: awalsh128/cache-apt-pkgs-action@v1
       with:
-        packages: wine32 x11vnc xserver-xorg-video-dummy
+        packages: wine32 wine64 x11vnc xserver-xorg-video-dummy
         execute_install_scripts: true
         version: 1.0
 
@@ -39,12 +38,14 @@ runs:
       env:
         DISPLAY: :0.0
         WINEDEBUG: -all,err+all
+        WINEARCH: win64
       shell: bash
       run: ${GITHUB_ACTION_PATH}/install_iscc.sh
       
     - name: Build Inno Setup installer
       env:
         WINEDEBUG: -all,err+all
+        WINEARCH: win64
       shell: bash
       run: ${GITHUB_ACTION_PATH}/iscc.sh ${{ inputs.filename }}
 
