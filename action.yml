@@ -30,18 +30,11 @@ runs:
         DISPLAY: :0.0
         WINEDEBUG: -all,err+all
       shell: bash
-      run: |
-        curl -SL "https://files.jrsoftware.org/is/6/innosetup-6.4.0.exe" -o is.exe
-        sudo Xdummy :0 > /dev/null 2>&1 &
-        wine is.exe /SP- /VERYSILENT /ALLUSERS /SUPPRESSMSGBOXES /DOWNLOADISCRYPT=1
-        rm is.exe
-
-        cd "$HOME/.wine/drive_c/Program Files/Inno Setup 6/Languages"
-        curl -L "https://api.github.com/repos/jrsoftware/issrc/tarball/is-6_4_0" | tar xz --strip-components=4 --wildcards "*/Files/Languages/Unofficial/*.isl"
+      run: ${GITHUB_ACTION_PATH}/install_iscc.sh
       
     - name: Build Inno Setup installer
       shell: bash
       env:
         WINEDEBUG: -all,err+all
-      run: ${GITHUB_ACTION_PATH}/iscc.sh
+      run: ${GITHUB_ACTION_PATH}/iscc.sh ${{ inputs.filename }}
 
