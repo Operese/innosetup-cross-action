@@ -8,13 +8,22 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Install Wine
+    - name: Add i386 packages
       shell: bash
       run: |
         sudo dpkg --add-architecture i386
         sudo apt-get update
-        sudo apt-get install -y wine wine32
-        sudo apt-get install -y x11vnc xserver-xorg-video-dummy
+    
+    - name: Install and cache packages
+      uses: awalsh128/cache-apt-pkgs-action@v1
+      with:
+        packages: wine32 x11vnc xserver-xorg-video-dummy
+        execute_install_scripts: true
+        version: 1.0
+
+    - name: Install and cache wine
+      shell: bash
+      run: sudo apt-get install wine
 
     - name: Install InnoSetup
       env:
@@ -22,14 +31,12 @@ runs:
         WINEDEBUG: -all,err+all
       shell: bash
       run: |
-        set -eEu
-        
         curl -SL "https://files.jrsoftware.org/is/6/innosetup-6.4.0.exe" -o is.exe
         sudo Xdummy :0 > /dev/null 2>&1 &
         wine is.exe /SP- /VERYSILENT /ALLUSERS /SUPPRESSMSGBOXES /DOWNLOADISCRYPT=1
         rm is.exe
 
-        cd "~/.wine/drive_c/Program Files/Inno Setup 6/Languages" \
+        cd "$HOME/.wine/drive_c/Program Files/Inno Setup 6/Languages"
         curl -L "https://api.github.com/repos/jrsoftware/issrc/tarball/is-6_4_0" | tar xz --strip-components=4 --wildcards "*/Files/Languages/Unofficial/*.isl"
       
     - name: Build Inno Setup installer
