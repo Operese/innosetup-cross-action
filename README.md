@@ -1,6 +1,11 @@
-# Inno Setup Cross Action
+# Inno Setup Cross
 
-Cross-compile InnoSetup installers using Wine on Ubuntu.
+Cross-compile InnoSetup installers using Wine on an Ubuntu runner.
+
+This action is adapted from https://github.com/amake/innosetup-docker/. Due to the extra overhead of spinning up a new Docker container each time and flaky behaviour with `docker run` in Gitea Actions, it was more straightforward to extract the contents of the container to the GitHub Actions format.
+
+The action does not support Windows or MacOS runners at present, and there are no plans to add support.
+
 
 ## Usage
 
@@ -21,7 +26,9 @@ jobs:
           filename: InstallerConfig.iss
 ```
 
-### Inputs
+The compiled installer binaries will be located at `$PWD/Output/[OutputBaseFilename].exe`, where `[OutputBaseFilename]` is a key in the InnoSetup installer configuration.
+
+## Inputs
 
 ```yaml
 inputs:
