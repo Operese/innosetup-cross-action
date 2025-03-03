@@ -8,7 +8,7 @@ DefaultDirName={autopf}\ActionTest
 OutputBaseFilename=ActionTestInstaller
 
 [Files]
-Source: "README.md"; DestDir: "{app}"; Flags: isreadme
+Source: "..\README.md"; DestDir: "{app}"; Flags: isreadme
 Source: "Test.exe"; DestDir: "{app}"
 
 [Icons]

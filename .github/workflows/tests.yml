@@ -12,12 +12,30 @@ jobs:
       - name: Build installer
         uses: ./
         with:
-          filename: Test.iss
+          filename: test/Test.iss
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ActionTestInstaller.exe
-          path: Output/ActionTestInstaller.exe
+          path: test/Output/ActionTestInstaller.exe
+          if-no-files-found: error
+          
+  test-build-installer-high-compression:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build installer
+        uses: ./
+        with:
+          filename: test/HighCompression.iss
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CompressionTestInstaller.exe
+          path: test/Output/CompressionTestInstaller.exe
           if-no-files-found: error
           
