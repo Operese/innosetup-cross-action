@@ -8,11 +8,12 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Add i386 packages
+    - name: Add i386 architecture
       shell: bash
       run: |
         sudo dpkg --add-architecture i386
         sudo apt-get update
+
     
     - name: Install and cache packages
       uses: awalsh128/cache-apt-pkgs-action@v1
@@ -21,9 +22,10 @@ runs:
         execute_install_scripts: true
         version: 1.0
 
+    # If wine is reinstalled from a cache, it cannot be found on the PATH, so it gets installed separately
     - name: Install wine without caching
       shell: bash
-      run: sudo apt-get install wine
+      run: sudo apt-get install -y wine
 
     - name: Cache InnoSetup
       id: cache-innosetup
@@ -41,8 +43,8 @@ runs:
       run: ${GITHUB_ACTION_PATH}/install_iscc.sh
       
     - name: Build Inno Setup installer
-      shell: bash
       env:
         WINEDEBUG: -all,err+all
+      shell: bash
       run: ${GITHUB_ACTION_PATH}/iscc.sh ${{ inputs.filename }}
 
